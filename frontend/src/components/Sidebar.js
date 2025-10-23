@@ -24,7 +24,7 @@ const Sidebar = () => {
         <div className="menu-item active">
           <div className="menu-item-content">
             <ListChecks size={18} color="#FFFFFF" />
-            <span>All Tasks</span>
+            <span>All Tasks count</span>
           </div>
           <div className="menu-count">10</div>
         </div>
@@ -33,7 +33,7 @@ const Sidebar = () => {
         <div className="menu-item">
           <div className="menu-item-content">
             <Circle size={18} color="#FFFFFF" />
-            <span>Active</span>
+            <span>Active count</span>
           </div>
           <div className="menu-count">10</div>
         </div>
@@ -42,7 +42,7 @@ const Sidebar = () => {
         <div className="menu-item">
           <div className="menu-item-content">
             <CheckCircle2 size={18} color="#FFFFFF" />
-            <span>Completed</span>
+            <span>Completed count</span>
           </div>
           <div className="menu-count">10</div>
         </div>

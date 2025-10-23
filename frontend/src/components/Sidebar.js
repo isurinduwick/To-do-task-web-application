@@ -8,7 +8,7 @@ const Sidebar = () => {
       <div className="logo-container">
         <div className="logo-square"></div>
         <div className="logo-text">
-          <div className="logo-main">TaskFlow</div>
+          <div className="logo-main">To do</div>
           <div className="logo-subtitle">Stay Organized</div>
         </div>
       </div>

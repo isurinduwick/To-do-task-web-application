@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AddTaskForm = ({ newTask, onInputChange, onAddTask }) => {
+const AddTaskForm = ({ newTask, onInputChange, onAddTask, isLoading }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     onAddTask();
@@ -19,6 +19,7 @@ const AddTaskForm = ({ newTask, onInputChange, onAddTask }) => {
           name="title"
           value={newTask.title}
           onChange={onInputChange}
+          disabled={isLoading}
         />
         
         <label className="form-label description-label">Description</label>
@@ -28,10 +29,15 @@ const AddTaskForm = ({ newTask, onInputChange, onAddTask }) => {
           name="description"
           value={newTask.description}
           onChange={onInputChange}
+          disabled={isLoading}
         />
         
-        <button type="submit" className="add-task-button">
-          <span>+ Add Task</span>
+        <button 
+          type="submit" 
+          className="add-task-button"
+          disabled={isLoading}
+        >
+          <span>{isLoading ? 'Adding...' : '+ Add Task'}</span>
         </button>
       </form>
     </div>

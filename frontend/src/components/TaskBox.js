@@ -1,0 +1,61 @@
+import React from 'react';
+import { Check, CheckCheck } from 'lucide-react';
+
+const TaskBox = ({ tasks, onMarkDone, activeTasksCount, completedTasksCount }) => {
+  return (
+    <div className="task-box">
+      <div className="task-box-header">
+        <h2 className="tasks-title">Tasks</h2>
+        
+        <div className="task-filter">
+          <div className="filter-content">
+            <div className="active-filter">
+              <div className="active-dot"></div>
+              <span className="active-text">{activeTasksCount} Active</span>
+            </div>
+            <div className="done-filter">
+              <div className="done-dot"></div>
+              <span className="done-text">{completedTasksCount} Done</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="tasks-container">
+        {tasks.map((task) => (
+          <div key={task.id} className={`task-item ${task.completed ? 'completed' : ''}`}>
+            <div className="task-content">
+              <div className="task-checkbox">
+                <div className={`checkbox-circle ${task.completed ? 'completed-checkbox' : ''}`}>
+                  {task.completed && <Check size={12} color="#FFFFFF" />}
+                </div>
+              </div>
+              <div className="task-details">
+                <div className="task-item-title">{task.title}</div>
+                <div className="task-item-description">
+                  {task.description}
+                </div>
+              </div>
+            </div>
+            {!task.completed ? (
+              <button 
+                className="mark-done-button"
+                onClick={() => onMarkDone(task.id)}
+              >
+                <Check size={14} color="#FFFFFF" />
+                <span className="mark-done-text">Mark Done</span>
+              </button>
+            ) : (
+              <button className="mark-done-button">
+                <CheckCheck size={16} color="#FFFFFF" />
+                <span className="mark-done-text">Done</span>
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default TaskBox;

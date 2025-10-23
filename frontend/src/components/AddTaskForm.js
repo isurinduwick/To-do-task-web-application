@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { validateTask, validateTaskLimit, VALIDATION_RULES } from '../utils/taskValidation';
 
-const AddTaskForm = ({ newTask, onInputChange, onAddTask, taskCount }) => {
+const AddTaskForm = ({ newTask, onInputChange, onAddTask, taskCount, isLoading }) => {
   const [errors, setErrors] = useState({ title: [], description: [] });
   const [limitError, setLimitError] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -50,6 +50,7 @@ const AddTaskForm = ({ newTask, onInputChange, onAddTask, taskCount }) => {
           value={newTask.title}
           onChange={onInputChange}
           maxLength={VALIDATION_RULES.TITLE_MAX_LENGTH}
+          disabled={isLoading}
         />
         <div className="char-count">{newTask.title.length}/{VALIDATION_RULES.TITLE_MAX_LENGTH}</div>
         {submitted && errors.title.length > 0 && (
@@ -68,6 +69,7 @@ const AddTaskForm = ({ newTask, onInputChange, onAddTask, taskCount }) => {
           value={newTask.description}
           onChange={onInputChange}
           maxLength={VALIDATION_RULES.DESCRIPTION_MAX_LENGTH}
+          disabled={isLoading}
         />
         <div className="char-count">{newTask.description.length}/{VALIDATION_RULES.DESCRIPTION_MAX_LENGTH}</div>
         {submitted && errors.description.length > 0 && (
@@ -78,8 +80,12 @@ const AddTaskForm = ({ newTask, onInputChange, onAddTask, taskCount }) => {
           </div>
         )}
         
-        <button type="submit" className="add-task-button">
-          <span>+ Add Task</span>
+        <button 
+          type="submit" 
+          className="add-task-button"
+          disabled={isLoading}
+        >
+          <span>{isLoading ? 'Adding...' : '+ Add Task'}</span>
         </button>
       </form>
     </div>

@@ -3,49 +3,24 @@ import './App.css';
 import Sidebar from './components/Sidebar';
 import AddTaskForm from './components/AddTaskForm';
 import TaskBox from './components/TaskBox';
+import useTasks from './hooks/useTasks';
 
 function App() {
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: "Lorem ipsum aliquet ultricies",
-      description: "Lorem ipsum at adipiscing sit unra dignissim rutrum et sed quis ipsum elit locus ac...",
-      completed: false
-    },
-    {
-      id: 2,
-      title: "Lorem ipsum aliquet ultricies", 
-      description: "Lorem ipsum at adipiscing sit unra dignissim rutrum et sed quis ipsum elit locus ac...",
-      completed: false
-    },
-    {
-      id: 3,
-      title: "Lorem ipsum aliquet ultricies",
-      description: "Lorem ipsum at adipiscing sit unra dignissim rutrum et sed quis ipsum elit locus ac...",
-      completed: true
-    }
-  ]);
-
   const [newTask, setNewTask] = useState({ title: '', description: '' });
+  const { 
+    tasks, 
+    isLoading, 
+    error, 
+    actionInProgress, 
+    addTask, 
+    markTaskCompleted
+  } = useTasks();
 
-  const handleAddTask = () => {
-    if (newTask.title.trim() === '') return;
-    
-    const task = {
-      id: tasks.length + 1,
-      title: newTask.title,
-      description: newTask.description,
-      completed: false
-    };
-    
-    setTasks([...tasks, task]);
-    setNewTask({ title: '', description: '' });
-  };
-
-  const handleMarkDone = (taskId) => {
-    setTasks(tasks.map(task => 
-      task.id === taskId ? { ...task, completed: true } : task
-    ));
+  const handleAddTask = async () => {
+    const result = await addTask(newTask);
+    if (result) {
+      setNewTask({ title: '', description: '' });
+    }
   };
 
   const handleInputChange = (e) => {
@@ -66,6 +41,7 @@ function App() {
         <div className="welcome-section">
           <h1>Welcome Back!</h1>
           <p>You have {activeTasksCount} active tasks today</p>
+          {error && <p className="error-message">{error}</p>}
         </div>
         
         <div className="content-container">
@@ -74,12 +50,14 @@ function App() {
             onInputChange={handleInputChange}
             onAddTask={handleAddTask}
             taskCount={activeTasksCount}
+            isLoading={actionInProgress}
           />
           <TaskBox 
             tasks={tasks}
-            onMarkDone={handleMarkDone}
+            onMarkDone={markTaskCompleted}
             activeTasksCount={activeTasksCount}
             completedTasksCount={completedTasksCount}
+            isLoading={isLoading}
           />
         </div>
       </main>

@@ -1,0 +1,85 @@
+import axios from 'axios';
+
+// API base URL
+const API_BASE_URL = 'http://localhost:8000/api';
+
+/**
+ * Task Service - Handles all API calls related to tasks
+ */
+export const TaskService = {
+  /**
+   * Get all tasks
+   * @returns {Promise<Array>} - Array of task objects
+   */
+  getAllTasks: async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/tasks/recent`);
+      return response.data;
+    } catch (error) {
+      console.error('Error getting all tasks:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get recent tasks
+   * @returns {Promise<Array>} - Array of recent task objects
+   */
+  getRecentTasks: async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/tasks/recent`);
+      return response.data;
+    } catch (error) {
+      console.error('Error getting recent tasks:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Create a new task
+   * @param {Object} taskData - Task data (title, description)
+   * @returns {Promise<Object>} - Created task object
+   */
+  createTask: async (taskData) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/tasks`, taskData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating task:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Update a task
+   * @param {number|string} taskId - ID of the task to update
+   * @param {Object} updates - Task properties to update
+   * @returns {Promise<Object>} - Updated task object
+   */
+  updateTask: async (taskId, updates) => {
+    try {
+      const response = await axios.put(`${API_BASE_URL}/tasks/${taskId}`, updates);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating task:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Delete a task
+   * @param {number|string} taskId - ID of the task to delete
+   * @returns {Promise<void>}
+   */
+  deleteTask: async (taskId) => {
+    try {
+      await axios.delete(`${API_BASE_URL}/tasks/${taskId}`);
+      return true;
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      throw error;
+    }
+  }
+};
+
+export default TaskService;

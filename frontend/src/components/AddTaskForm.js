@@ -1,13 +1,23 @@
 import React, { useState } from 'react';
-import { validateTask, VALIDATION_RULES } from '../utils/taskValidation';
+import { validateTask, validateTaskLimit, VALIDATION_RULES } from '../utils/taskValidation';
 
-const AddTaskForm = ({ newTask, onInputChange, onAddTask }) => {
+const AddTaskForm = ({ newTask, onInputChange, onAddTask, taskCount }) => {
   const [errors, setErrors] = useState({ title: [], description: [] });
+  const [limitError, setLimitError] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setSubmitted(true);
+
+    const limitValidation = validateTaskLimit(taskCount);
+    if (!limitValidation.isValid) {
+      setLimitError(limitValidation.errors[0]);
+      setErrors({ title: [], description: [] });
+      return;
+    }
+
+    setLimitError('');
     
     const validation = validateTask(newTask);
     
@@ -23,6 +33,12 @@ const AddTaskForm = ({ newTask, onInputChange, onAddTask }) => {
   return (
     <div className="add-task-form">
       <h2 className="add-task-title">Add a Task</h2>
+      
+      {limitError && (
+        <div className="error-messages" style={{ marginBottom: '20px' }}>
+          <p className="error-text" style={{ color: '#ff6b6b', fontWeight: 'bold' }}>{limitError}</p>
+        </div>
+      )}
       
       <form onSubmit={handleSubmit}>
         <label className="form-label title-label">Title</label>

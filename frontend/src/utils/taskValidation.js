@@ -2,6 +2,7 @@ export const VALIDATION_RULES = {
   TITLE_MAX_LENGTH: 100,
   DESCRIPTION_MAX_LENGTH: 500,
   INVALID_TITLE_CHARS: /[@#$%^&*()_+|~=`{}\[\]:;"'<>,.?\/]/g,
+  MAX_TASKS: 5,
 };
 
 export const validateTitle = (title) => {
@@ -45,6 +46,19 @@ export const validateDescription = (description) => {
   const consecutiveSpaces = /  +/g;
   if (consecutiveSpaces.test(description)) {
     errors.push('Description cannot contain multiple consecutive spaces');
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+};
+
+export const validateTaskLimit = (taskCount) => {
+  const errors = [];
+
+  if (taskCount >= VALIDATION_RULES.MAX_TASKS) {
+    errors.push(`You already have ${VALIDATION_RULES.MAX_TASKS} active tasks. Please complete or remove some tasks to add more.`);
   }
 
   return {

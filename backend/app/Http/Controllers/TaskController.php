@@ -36,4 +36,21 @@ class TaskController extends Controller
             'task' => $task
         ], 201);
     }
+
+    /**
+     * Get the 5 most recent tasks ordered by ID.
+     *
+     * @return JsonResponse
+     */
+    public function recent(): JsonResponse
+    {
+        $recentTasks = Task::orderBy('id', 'desc')
+                          ->limit(5)
+                          ->get();
+        
+        return response()->json([
+            'success' => true,
+            'tasks' => $recentTasks
+        ]);
+    }
 }

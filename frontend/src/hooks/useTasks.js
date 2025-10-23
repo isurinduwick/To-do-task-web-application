@@ -16,10 +16,12 @@ const useTasks = () => {
       setIsLoading(true);
       setError(null);
       const data = await TaskService.getAllTasks();
-      setTasks(data);
+      // Ensure data is an array
+      setTasks(Array.isArray(data) ? data : (data?.tasks || data?.data || []));
     } catch (err) {
       setError('Failed to load tasks. Please try again.');
       console.error('Error in fetchTasks:', err);
+      setTasks([]); // Set to empty array on error
     } finally {
       setIsLoading(false);
     }

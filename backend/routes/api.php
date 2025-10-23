@@ -15,6 +15,4 @@ Route::get('/tasks/all', [TaskController::class, 'index']);
 Route::get('/tasks/active', [TaskController::class, 'active']);
 Route::get('/tasks/completed', [TaskController::class, 'completed']);
 Route::get('/tasks/progress', [TaskController::class, 'progress']);
-Route::get('/tasks/{id}', [TaskController::class, 'show']);
-Route::put('/tasks/{id}', [TaskController::class, 'update']);
-Route::delete('/tasks/{id}', [TaskController::class, 'destroy']);
+

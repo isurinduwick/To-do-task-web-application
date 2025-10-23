@@ -97,12 +97,15 @@ class TaskController extends Controller
     {
         $total = Task::count();
         $completed = Task::where('completed', true)->count();
+        $pending = Task::where('completed', false)->count();
         
         $percentage = $total > 0 ? round(($completed / $total) * 100) : 0;
         
         return response()->json([
             'total' => $total,
             'completed' => $completed,
+            'pending' => $pending,
+            'count' => $total,
             'percentage' => $percentage
         ]);
     }

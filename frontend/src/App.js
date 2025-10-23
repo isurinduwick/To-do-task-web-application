@@ -49,6 +49,7 @@ function App() {
             newTask={newTask}
             onInputChange={handleInputChange}
             onAddTask={handleAddTask}
+            taskCount={activeTasksCount}
             isLoading={actionInProgress}
           />
           <TaskBox 

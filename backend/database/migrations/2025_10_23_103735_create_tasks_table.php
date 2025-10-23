@@ -17,7 +17,6 @@ return new class extends Migration
             $table->bigIncrements('id'); // Explicitly using bigIncrements for auto-incrementing primary key
             $table->string('title');
             $table->text('description')->nullable();
-            $table->enum('priority', ['low', 'medium', 'high'])->default('medium');
             $table->enum('status', ['pending', 'completed'])->default('pending');
             $table->dateTime('due_date')->nullable();
             $table->timestamp('completed_at')->nullable();

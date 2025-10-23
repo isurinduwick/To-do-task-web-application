@@ -1,38 +1,719 @@
-.App {
-  text-align: center;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f8fafc;
+  color: #334155;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+.app {
+  display: flex;
   min-height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  position: fixed;
+  width: 326px;
+  height: 100vh;
+  left: 0px;
+  top: 0px;
+  background: #03045E;
+  box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.1);
+  padding: 0;
   display: flex;
   flex-direction: column;
+}
+
+/* Logo Container */
+.logo-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0px;
+  position: relative;
+  width: 113px;
+  height: 54px;
+  left: 99px;
+  top: 30px;
+  margin-bottom: 30px;
+}
+
+.logo-square {
+  position: absolute;
+  width: 54px;
+  height: 54px;
+  left: -69px;
+  top: 0px;
+  background: #FFFFFF;
+  border-radius: 10px;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  width: 113px;
+  height: 54px;
+}
+
+.logo-main {
+  width: 113px;
+  height: 36px;
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 36px;
+  color: #FFFFFF;
+  flex: none;
+  order: 0;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.logo-subtitle {
+  width: 113px;
+  height: 18px;
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 18px;
+  color: #FFFFFF;
+  opacity: 0.5;
+  flex: none;
+  order: 1;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+/* Divider Line */
+.divider {
+  position: relative;
+  width: 266px;
+  height: 0px;
+  left: 30px;
+  top: 0px;
+  border: 0.5px solid #FFFFFF;
+  margin: 20px 0;
+}
+
+/* Menu Section */
+.menu-section {
+  position: relative;
+  padding: 0 30px;
+  margin-top: 10px;
+}
+
+.menu-title {
+  width: 45px;
+  height: 24px;
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  color: #FFFFFF;
+  opacity: 0.75;
+  margin-bottom: 10px;
+}
+
+.menu-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  gap: 10px;
+  width: 266px;
+  height: 44px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.menu-item.active {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+}
+
+.menu-item:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.menu-item-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+  gap: 15px;
+  width: auto;
+  height: 24px;
+}
+
+.menu-item-content span {
+  width: auto;
+  height: 24px;
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  color: #FFFFFF;
+}
+
+.menu-count {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3px 10px;
+  gap: 10px;
+  width: 32px;
+  height: 24px;
+  background: #FFFFFF;
+  border-radius: 100px;
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 18px;
+  color: #03045E;
+}
+
+/* Progress Section */
+.progress-section {
+  position: absolute;
+  width: 266px;
+  height: 122px;
+  left: 30px;
+  bottom: 47px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.progress-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px;
+  gap: 87px;
+  width: 236px;
+  height: 42px;
+}
+
+.progress-header span:first-child {
+  width: 70px;
+  height: 24px;
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  color: #FFFFFF;
+}
+
+.progress-percentage {
+  width: 57px;
+  height: 42px;
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 42px;
+  color: #FFFFFF;
+}
+
+.progress-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 10px;
+  width: 236px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.progress-completed {
+  width: 74px;
+  height: 12px;
+  background: #44B08F;
+  border-radius: 100px;
+}
+
+.progress-text {
+  width: 236px;
+  height: 18px;
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 18px;
+  color: #FFFFFF;
+  opacity: 0.75;
+  text-align: left;
+}
+
+/* Main Content Styles */
+.main-content {
+  flex: 1;
+  margin-left: 326px;
+  padding: 2rem;
+  max-width: calc(100% - 326px);
+}
+
+.welcome-section {
+  margin-bottom: 2rem;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.welcome-section h1 {
+  font-size: 1.875rem;
+  font-weight: 600;
+  color: #03045E;
+  margin-bottom: 0.5rem;
+}
+
+.welcome-section p {
+  color: #03045E;
+  font-size: 1rem;
+  opacity: 0.7;
+}
+
+.content-container {
+  display: flex;
+  gap: 24px;
+  justify-content: flex-start;
+}
+
+/* Add Task Form Styles */
+.add-task-form {
+  width: 510px;
+  height: 796px;
+  background: #FFFFFF;
+  box-shadow: -1px -1px 10px rgba(0, 0, 0, 0.1), 1px 1px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 25px;
+  padding: 30px;
+  position: relative;
+}
+
+.add-task-title {
+  width: 179px;
+  height: 48px;
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 32px;
+  line-height: 48px;
+  color: #03045E;
+  margin-bottom: 40px;
+}
+
+.form-label {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 27px;
+  color: #03045E;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.title-input {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 20px;
+  gap: 10px;
+  width: 450px;
+  height: 67px;
+  border: 0.5px solid rgba(3, 4, 94, 0.5);
+  border-radius: 10px;
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 27px;
+  color: #03045E;
+  margin-bottom: 40px;
+}
+
+.title-input::placeholder {
+  color: #03045E;
+  opacity: 0.5;
+}
+
+.description-input {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 20px;
+  gap: 10px;
+  width: 450px;
+  height: 204px;
+  border: 0.5px solid rgba(3, 4, 94, 0.5);
+  border-radius: 10px;
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 27px;
+  color: #03045E;
+  resize: none;
+  margin-bottom: 40px;
+}
+
+.description-input::placeholder {
+  color: #03045E;
+  opacity: 0.5;
+}
+
+.add-task-button {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 10px;
+  gap: 15px;
+  width: 450px;
+  height: 60px;
+  background: linear-gradient(270deg, #0096C7 0%, #00B4D8 50%, #48CAE4 100%);
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 30px;
+  color: #FFFFFF;
+}
+
+.add-task-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 180, 216, 0.3);
+}
+
+.add-task-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 180, 216, 0.3);
+}
+
+.add-task-button span {
+  background: transparent;
+}
+
+/* Task Box Styles */
+.task-box {
+  width: 510px;
+  background: #FFFFFF;
+  box-shadow: -1px -1px 10px rgba(0, 0, 0, 0.1), 1px 1px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 25px;
+  padding: 30px;
+  max-height: 796px;
+  overflow-y: auto;
+  position: relative;
+}
+
+.task-box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.tasks-title {
+  width: 92px;
+  height: 48px;
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 32px;
+  line-height: 48px;
+  color: #03045E;
+}
+
+.task-filter {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px 15px;
+  gap: 10px;
+  width: 153px;
+  height: 38px;
+  background: #E2EAFC;
+  border-radius: 100px;
+}
+
+.filter-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+  width: 123px;
+  height: 18px;
+  justify-content: space-between;
+}
+
+.active-filter {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  gap: 8px;
+  width: 63px;
+  height: 18px;
+}
+
+.active-dot {
+  width: 6px;
+  height: 6px;
+  background: #03045E;
+  border-radius: 50%;
+}
+
+.active-text {
+  width: 49px;
+  height: 18px;
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 18px;
+  color: #03045E;
+}
+
+.done-filter {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  gap: 8px;
+  width: 60px;
+  height: 18px;
+}
+
+.done-dot {
+  width: 6px;
+  height: 6px;
+  background: #44B08F;
+  border-radius: 50%;
+}
+
+.done-text {
+  width: 60px;
+  height: 18px;
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 18px;
+  color: #449B82;
+}
+
+/* Add space between Active and Done filters */
+.filter-content {
+  gap: 15px;
+}
+
+/* Task Item Styles */
+.tasks-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.task-item {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 15px;
+  gap: 10px;
+  width: 100%;
+  border: 0.5px solid rgba(3, 4, 94, 0.5);
+  border-radius: 10px;
+}
+
+.task-item.completed {
+  background: rgba(68, 176, 143, 0.1);
+  border: 1px solid #44B08F;
+}
+
+.task-content {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 15px;
+  flex: 1;
+}
+
+.task-checkbox {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 5px 0px;
+  gap: 10px;
+  width: 20px;
+  height: 30px;
+}
+
+.checkbox-circle {
+  box-sizing: border-box;
+  width: 20px;
+  height: 20px;
+  border: 1px solid rgba(3, 4, 94, 0.5);
+  border-radius: 50%;
+}
+
+.completed-checkbox {
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  background: #44B08F;
+  border: none;
 }
 
-.App-link {
-  color: #61dafb;
+.completed-checkbox svg {
+  width: 12px;
+  height: 12px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.task-item.completed .checkbox-circle {
+  background: #44B08F;
+  border: none;
+}
+
+.task-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 14px;
+  flex: 1;
+}
+
+.task-item-title {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 30px;
+  color: #03045E;
+}
+
+.task-item.completed .task-item-title {
+  text-decoration-line: line-through;
+  color: #449B82;
+}
+
+.task-item-description {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 18px;
+  color: #03045E;
+}
+
+.task-item.completed .task-item-description {
+  color: #44B08F;
+}
+
+.mark-done-button {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 20px;
+  gap: 10px;
+  width: 140px;
+  height: 41px;
+  background: linear-gradient(270deg, #0096C7 0%, #00B4D8 50%, #48CAE4 100%);
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-self: flex-start;
+}
+
+.mark-done-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 180, 216, 0.3);
+}
+
+.mark-done-button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 180, 216, 0.3);
+}
+
+.task-item.completed .mark-done-button {
+  width: 103px;
+  background: #44B08F;
+}
+
+.task-item.completed .mark-done-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(68, 176, 143, 0.3);
+  background: #3a9a7a;
+}
+
+.task-item.completed .mark-done-button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(68, 176, 143, 0.3);
+}
+
+.mark-done-button svg {
+  background: transparent;
+}
+
+.mark-done-text {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 21px;
+  color: #FFFFFF;
+}
+
+.task-item.completed .mark-done-text {
+  width: 37px;
+}
+
+/* Make sure SVG icons in buttons don't have background */
+.mark-done-button svg {
+  background: transparent;
+}
+
+.add-task-button svg {
+  background: transparent;
+}
+
+/* Menu Icons */
+.menu-item-content svg {
+  flex-shrink: 0;
 }

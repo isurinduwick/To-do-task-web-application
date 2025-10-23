@@ -13,7 +13,7 @@ function App() {
     error, 
     actionInProgress, 
     addTask, 
-    markTaskCompleted 
+    markTaskCompleted
   } = useTasks();
 
   const handleAddTask = async () => {

@@ -95,7 +95,13 @@ export const TaskService = {
   markTaskAsDone: async (taskId) => {
     try {
       const response = await axios.put(`${API_BASE_URL}/tasks/${taskId}/mark-as-done`);
-      return response.data.task;
+      const task = response.data.task;
+      
+      // Ensure completed property is set based on status
+      return {
+        ...task,
+        completed: task.status === 'completed'
+      };
     } catch (error) {
       console.error('Error marking task as done:', error);
       throw error;

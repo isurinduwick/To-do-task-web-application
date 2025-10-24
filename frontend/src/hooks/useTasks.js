@@ -10,18 +10,24 @@ const useTasks = () => {
   const [error, setError] = useState(null);
   const [actionInProgress, setActionInProgress] = useState(false);
 
+  const normalizeTask = (task) => ({
+    ...task,
+    completed: task.completed ?? (task.status === 'completed')
+  });
+
   // Fetch all tasks
   const fetchTasks = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
       const data = await TaskService.getAllTasks();
-      // Ensure data is an array
-      setTasks(Array.isArray(data) ? data : (data?.tasks || data?.data || []));
+      const raw = Array.isArray(data) ? data : (data?.tasks ?? data?.data ?? []);
+      const normalizedTasks = raw.map(normalizeTask);
+      setTasks(normalizedTasks);
     } catch (err) {
       setError('Failed to load tasks. Please try again.');
       console.error('Error in fetchTasks:', err);
-      setTasks([]); // Set to empty array on error
+      setTasks([]);
     } finally {
       setIsLoading(false);
     }
@@ -29,7 +35,7 @@ const useTasks = () => {
 
   // Create a new task
   const addTask = useCallback(async (taskData) => {
-    if (!taskData.title.trim()) {
+    if (!taskData?.title || !taskData.title.trim()) {
       setError('Task title cannot be empty.');
       return null;
     }
@@ -38,9 +44,8 @@ const useTasks = () => {
       setActionInProgress(true);
       setError(null);
       const newTask = await TaskService.createTask(taskData);
-      // Ensure newTask has required properties before adding
       if (newTask && newTask.id) {
-        setTasks(prev => [...prev, newTask]);
+        setTasks(prev => [...prev, normalizeTask(newTask)]);
         return newTask;
       } else {
         throw new Error('Invalid task response from server');
@@ -60,14 +65,14 @@ const useTasks = () => {
       setActionInProgress(true);
       setError(null);
       const updatedTask = await TaskService.markTaskAsDone(taskId);
-      setTasks(prev => prev.map(task => 
-        task.id === taskId ? { ...task, completed: true, status: updatedTask.status } : task
-      ));
-      return true;
+      if (!updatedTask) throw new Error('No task returned from server');
+      const normalized = normalizeTask(updatedTask);
+      setTasks(prev => prev.map(t => (t.id === taskId ? normalized : t)));
+      return normalized;
     } catch (err) {
       setError('Failed to update task. Please try again.');
       console.error('Error in markTaskCompleted:', err);
-      return false;
+      return null;
     } finally {
       setActionInProgress(false);
     }
@@ -78,18 +83,16 @@ const useTasks = () => {
     try {
       setActionInProgress(true);
       setError(null);
-      
       const response = await TaskService.deleteTask(taskId);
-      
-      // Handle the response - check for success flag
-      if (response?.success) {
+      const success = response?.success ?? (response === true);
+      if (success) {
         setTasks(prev => prev.filter(task => task.id !== taskId));
         return true;
       } else {
         throw new Error('Failed to delete task');
       }
     } catch (err) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to delete task. Please try again.';
+      const errorMessage = err?.response?.data?.message || err?.message || 'Failed to delete task. Please try again.';
       setError(errorMessage);
       console.error('Error in deleteTask:', err);
       return false;

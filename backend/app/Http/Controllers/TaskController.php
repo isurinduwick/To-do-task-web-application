@@ -111,6 +111,36 @@ class TaskController extends Controller
     }
 
     /**
+     * Mark a task as done.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function markAsDone(int $id): JsonResponse
+    {
+        try {
+            $task = Task::findOrFail($id);
+            
+            $task->update([
+                'completed' => true,
+                'status' => 'completed'
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Task marked as done',
+                'task' => $task
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error marking task as done',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Display the specified task.
      */
     public function show($id)

@@ -113,4 +113,237 @@ class TaskApiTest extends TestCase
         $this->assertEquals($newerTasks[1]->id, $responseData[0]['id']);
         $this->assertEquals($newerTasks[0]->id, $responseData[1]['id']);
     }
+
+    /** @test */
+    public function can_get_all_tasks()
+    {
+        Task::factory()->count(5)->create();
+
+        $response = $this->getJson('/api/tasks/all');
+
+        $response->assertStatus(200)
+                ->assertJsonStructure([
+                    'tasks' => [
+                        '*' => [
+                            'id',
+                            'title',
+                            'description',
+                            'status'
+                        ]
+                    ],
+                    'count'
+                ])
+                ->assertJsonCount(5, 'tasks');
+    }
+
+    /** @test */
+    public function can_get_active_tasks()
+    {
+        Task::factory()->create(['completed' => false]);
+        Task::factory()->create(['completed' => false]);
+        Task::factory()->create(['completed' => true]);
+
+        $response = $this->getJson('/api/tasks/active');
+
+        $response->assertStatus(200)
+                ->assertJsonCount(2, 'tasks')
+                ->assertJson(['count' => 2]);
+    }
+
+    /** @test */
+    public function can_get_completed_tasks()
+    {
+        Task::factory()->create(['completed' => false]);
+        Task::factory()->count(2)->create(['completed' => true]);
+
+        $response = $this->getJson('/api/tasks/completed');
+
+        $response->assertStatus(200)
+                ->assertJsonCount(2, 'tasks')
+                ->assertJson(['count' => 2]);
+    }
+
+    /** @test */
+    public function can_get_task_progress()
+    {
+        Task::factory()->count(4)->create(['completed' => false]);
+        Task::factory()->count(1)->create(['completed' => true]);
+
+        $response = $this->getJson('/api/tasks/progress');
+
+        $response->assertStatus(200)
+                ->assertJson([
+                    'total' => 5,
+                    'completed' => 1,
+                    'pending' => 4,
+                    'percentage' => 20
+                ]);
+    }
+
+    /** @test */
+    public function can_mark_task_as_done()
+    {
+        $task = Task::factory()->create(['completed' => false, 'status' => 'pending']);
+
+        $response = $this->putJson("/api/tasks/{$task->id}/mark-as-done");
+
+        $response->assertStatus(200)
+                ->assertJson([
+                    'success' => true,
+                    'task' => [
+                        'id' => $task->id,
+                        'completed' => true,
+                        'status' => 'completed'
+                    ]
+                ]);
+
+        $this->assertDatabaseHas('tasks', [
+            'id' => $task->id,
+            'completed' => true,
+            'status' => 'completed'
+        ]);
+    }
+
+    /** @test */
+    public function mark_as_done_returns_404_for_nonexistent_task()
+    {
+        $response = $this->putJson("/api/tasks/999/mark-as-done");
+
+        $response->assertStatus(404);
+    }
+
+    /** @test */
+    public function can_delete_task()
+    {
+        $task = Task::factory()->create();
+
+        $response = $this->deleteJson("/api/tasks/{$task->id}");
+
+        $response->assertStatus(200)
+                ->assertJson([
+                    'success' => true,
+                    'message' => 'Task deleted successfully'
+                ]);
+
+        $this->assertDatabaseMissing('tasks', ['id' => $task->id]);
+    }
+
+    /** @test */
+    public function delete_returns_404_for_nonexistent_task()
+    {
+        $response = $this->deleteJson("/api/tasks/999");
+
+        $response->assertStatus(404);
+    }
+
+    /** @test */
+    public function can_show_single_task()
+    {
+        $task = Task::factory()->create();
+
+        $response = $this->getJson("/api/tasks/{$task->id}");
+
+        $response->assertStatus(200)
+                ->assertJson([
+                    'id' => $task->id,
+                    'title' => $task->title,
+                    'description' => $task->description
+                ]);
+    }
+
+    /** @test */
+    public function show_returns_404_for_nonexistent_task()
+    {
+        $response = $this->getJson("/api/tasks/999");
+
+        $response->assertStatus(404);
+    }
+
+    /** @test */
+    public function can_update_task()
+    {
+        $task = Task::factory()->create([
+            'title' => 'Original Title',
+            'description' => 'Original Description'
+        ]);
+
+        $response = $this->putJson("/api/tasks/{$task->id}", [
+            'title' => 'Updated Title',
+            'description' => 'Updated Description'
+        ]);
+
+        $response->assertStatus(200)
+                ->assertJson([
+                    'id' => $task->id,
+                    'title' => 'Updated Title',
+                    'description' => 'Updated Description'
+                ]);
+
+        $this->assertDatabaseHas('tasks', [
+            'id' => $task->id,
+            'title' => 'Updated Title'
+        ]);
+    }
+
+    /** @test */
+    public function update_validates_title_max_length()
+    {
+        $task = Task::factory()->create();
+
+        $response = $this->putJson("/api/tasks/{$task->id}", [
+            'title' => str_repeat('a', 256)
+        ]);
+
+        $response->assertStatus(422)
+                ->assertJsonValidationErrors(['title']);
+    }
+
+    /** @test */
+    public function recent_tasks_limit_5()
+    {
+        Task::factory()->count(10)->create();
+
+        $response = $this->getJson('/api/tasks/recent');
+        $responseData = $response->json();
+
+        $this->assertCount(5, $responseData);
+    }
+
+    /** @test */
+    public function empty_list_returns_empty_array()
+    {
+        $response = $this->getJson('/api/tasks/recent');
+
+        $response->assertStatus(200)
+                ->assertJson([]);
+    }
+
+    /** @test */
+    public function create_task_with_all_fields()
+    {
+        $response = $this->postJson('/api/tasks', [
+            'title' => 'Complete Task',
+            'description' => 'This is a complete task',
+        ]);
+
+        $response->assertStatus(201)
+                ->assertJsonStructure([
+                    'success',
+                    'message',
+                    'task' => [
+                        'id',
+                        'title',
+                        'description',
+                        'priority',
+                        'status'
+                    ]
+                ]);
+
+        $this->assertDatabaseHas('tasks', [
+            'title' => 'Complete Task',
+            'description' => 'This is a complete task',
+            'priority' => 'medium',
+            'status' => 'pending'
+        ]);
+    }
 }

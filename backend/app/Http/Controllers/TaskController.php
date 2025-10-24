@@ -3,11 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Services\TaskService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class TaskController extends Controller
 {
+    private TaskService $taskService;
+
+    /**
+     * Constructor with dependency injection
+     */
+    public function __construct(TaskService $taskService)
+    {
+        $this->taskService = $taskService;
+    }
+
     /**
      * Store a newly created task in the database.
      *
@@ -22,19 +33,9 @@ class TaskController extends Controller
             'description' => 'nullable|string',
         ]);
         
-        // Create a new task
-        $task = Task::create([
-            'title' => $validated['title'],
-            'description' => $validated['description'] ?? null,
-            'priority' => 'medium',  // Default value
-            'status' => 'pending',   // Default value
-        ]);
+        $result = $this->taskService->createTask($validated);
         
-        return response()->json([
-            'success' => true,
-            'message' => 'Task created successfully',
-            'task' => $task
-        ], 201);
+        return response()->json($result, 201);
     }
 
     /**
@@ -44,14 +45,9 @@ class TaskController extends Controller
      */
     public function recent(): JsonResponse
     {
-        $recentTasks = Task::orderBy('id', 'desc')
-                          ->limit(5)
-                          ->get();
+        $recentTasks = $this->taskService->getRecentTasks();
         
-        return response()->json([
-            'success' => true,
-            'tasks' => $recentTasks
-        ]);
+        return response()->json($recentTasks);
     }
 
     /**
@@ -59,7 +55,7 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $tasks = Task::all();
+        $tasks = $this->taskService->getAllTasks();
         return response()->json([
             'tasks' => $tasks,
             'count' => $tasks->count()
@@ -71,7 +67,7 @@ class TaskController extends Controller
      */
     public function active()
     {
-        $tasks = Task::where('completed', false)->get();
+        $tasks = $this->taskService->getActiveTasks();
         return response()->json([
             'tasks' => $tasks,
             'count' => $tasks->count()
@@ -83,7 +79,7 @@ class TaskController extends Controller
      */
     public function completed()
     {
-        $tasks = Task::where('completed', true)->get();
+        $tasks = $this->taskService->getCompletedTasks();
         return response()->json([
             'tasks' => $tasks,
             'count' => $tasks->count()
@@ -95,19 +91,9 @@ class TaskController extends Controller
      */
     public function progress()
     {
-        $total = Task::count();
-        $completed = Task::where('completed', true)->count();
-        $pending = Task::where('completed', false)->count();
+        $stats = $this->taskService->getProgress();
         
-        $percentage = $total > 0 ? round(($completed / $total) * 100) : 0;
-        
-        return response()->json([
-            'total' => $total,
-            'completed' => $completed,
-            'pending' => $pending,
-            'count' => $total,
-            'percentage' => $percentage
-        ]);
+        return response()->json($stats);
     }
 
     /**
@@ -119,18 +105,11 @@ class TaskController extends Controller
     public function markAsDone(int $id): JsonResponse
     {
         try {
-            $task = Task::findOrFail($id);
+            $result = $this->taskService->completeTask($id);
             
-            $task->update([
-                'completed' => true,
-                'status' => 'completed'
-            ]);
+            $statusCode = $result['success'] ? 200 : 404;
             
-            return response()->json([
-                'success' => true,
-                'message' => 'Task marked as done',
-                'task' => $task
-            ], 200);
+            return response()->json($result, $statusCode);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -145,8 +124,13 @@ class TaskController extends Controller
      */
     public function show($id)
     {
-        $task = Task::findOrFail($id);
-        return response()->json($task);
+        $result = $this->taskService->getTaskById($id);
+        
+        if (!$result['success']) {
+            return response()->json($result, 404);
+        }
+
+        return response()->json($result['task']);
     }
 
     /**
@@ -160,36 +144,13 @@ class TaskController extends Controller
             'completed' => 'boolean'
         ]);
 
-        $task = Task::findOrFail($id);
-        $task->update($request->all());
+        $result = $this->taskService->updateTask($id, $request->all());
         
-        return response()->json($task);
-    }
-
-    /**
-     * Delete a completed task by ID.
-     *
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function destroyCompleted(int $id): JsonResponse
-    {
-        try {
-            $task = Task::where('completed', true)->findOrFail($id);
-            $task->delete();
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Completed task deleted successfully',
-                'task' => $task
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error deleting completed task',
-                'error' => $e->getMessage()
-            ], 500);
+        if (!$result['success']) {
+            return response()->json($result, 404);
         }
+
+        return response()->json($result['task']);
     }
 
     /**
@@ -198,14 +159,11 @@ class TaskController extends Controller
     public function destroy($id)
     {
         try {
-            $task = Task::findOrFail($id);
-            $task->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Task deleted successfully',
-                'task' => $task
-            ], 200);
+            $result = $this->taskService->deleteTask($id);
+            
+            $statusCode = $result['success'] ? 200 : 404;
+            
+            return response()->json($result, $statusCode);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

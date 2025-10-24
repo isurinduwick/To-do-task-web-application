@@ -54,9 +54,9 @@ const useTasks = () => {
     try {
       setActionInProgress(true);
       setError(null);
-      await TaskService.updateTask(taskId, { completed: true });
+      const updatedTask = await TaskService.markTaskAsDone(taskId);
       setTasks(prev => prev.map(task => 
-        task.id === taskId ? { ...task, completed: true } : task
+        task.id === taskId ? { ...task, completed: true, status: updatedTask.status } : task
       ));
       return true;
     } catch (err) {

@@ -79,6 +79,21 @@ export const TaskService = {
       console.error('Error deleting task:', error);
       throw error;
     }
+  },
+
+  /**
+   * Mark a task as done
+   * @param {number|string} taskId - ID of the task to mark as done
+   * @returns {Promise<Object>} - Updated task object
+   */
+  markTaskAsDone: async (taskId) => {
+    try {
+      const response = await axios.put(`${API_BASE_URL}/tasks/${taskId}/mark-as-done`);
+      return response.data.task;
+    } catch (error) {
+      console.error('Error marking task as done:', error);
+      throw error;
+    }
   }
 };
 

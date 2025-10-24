@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { validateTask, validateTaskLimit, VALIDATION_RULES } from '../utils/taskValidation';
+import { useNotification } from '../hooks/useNotification';
 
 const AddTaskForm = ({ newTask, onInputChange, onAddTask, taskCount, isLoading, totalTasksCount = 0 }) => {
   const [errors, setErrors] = useState({ title: [], description: [] });
   const [limitError, setLimitError] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const { addNotification } = useNotification();
 
   const handleSubmit = (e) => {
     e.preventDefault();

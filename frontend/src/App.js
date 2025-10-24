@@ -3,10 +3,15 @@ import './App.css';
 import Sidebar from './components/Sidebar';
 import AddTaskForm from './components/AddTaskForm';
 import TaskBox from './components/TaskBox';
+import ToastContainer from './components/ToastContainer';
+import { NotificationProvider } from './context/NotificationContext';
+import { useNotification } from './hooks/useNotification';
 import useTasks from './hooks/useTasks';
 
-function App() {
+function AppContent() {
   const [newTask, setNewTask] = useState({ title: '', description: '' });
+  const { addNotification } = useNotification();
+  
   const { 
     tasks, 
     isLoading, 
@@ -15,7 +20,7 @@ function App() {
     addTask, 
     markTaskCompleted,
     deleteTask
-  } = useTasks();
+  } = useTasks(addNotification);
 
   const handleAddTask = async () => {
     const result = await addTask(newTask);
@@ -65,7 +70,16 @@ function App() {
           />
         </div>
       </main>
+      <ToastContainer />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <NotificationProvider>
+      <AppContent />
+    </NotificationProvider>
   );
 }
 

@@ -4,7 +4,7 @@ import TaskService from '../services/taskService';
 /**
  * Custom hook for managing tasks
  */
-const useTasks = () => {
+const useTasks = (onNotification) => {
   const [tasks, setTasks] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -46,18 +46,24 @@ const useTasks = () => {
       const newTask = await TaskService.createTask(taskData);
       if (newTask && newTask.id) {
         setTasks(prev => [...prev, normalizeTask(newTask)]);
+        if (onNotification) {
+          onNotification(`Task "${newTask.title}" added successfully! 🎉`, 'success');
+        }
         return newTask;
       } else {
         throw new Error('Invalid task response from server');
       }
     } catch (err) {
       setError('Failed to add task. Please try again.');
+      if (onNotification) {
+        onNotification('Failed to add task. Please try again.', 'error');
+      }
       console.error('Error in addTask:', err);
       return null;
     } finally {
       setActionInProgress(false);
     }
-  }, []);
+  }, [onNotification]);
 
   // Mark a task as completed
   const markTaskCompleted = useCallback(async (taskId) => {
@@ -67,26 +73,37 @@ const useTasks = () => {
       const updatedTask = await TaskService.markTaskAsDone(taskId);
       if (!updatedTask) throw new Error('No task returned from server');
       const normalized = normalizeTask(updatedTask);
+      const taskTitle = tasks.find(t => t.id === taskId)?.title || 'Task';
       setTasks(prev => prev.map(t => (t.id === taskId ? normalized : t)));
+      if (onNotification) {
+        onNotification(`"${taskTitle}" marked as done! ✓`, 'success');
+      }
       return normalized;
     } catch (err) {
       setError('Failed to update task. Please try again.');
+      if (onNotification) {
+        onNotification('Failed to mark task as done.', 'error');
+      }
       console.error('Error in markTaskCompleted:', err);
       return null;
     } finally {
       setActionInProgress(false);
     }
-  }, []);
+  }, [tasks, onNotification]);
 
   // Delete a task
   const deleteTask = useCallback(async (taskId) => {
     try {
       setActionInProgress(true);
       setError(null);
+      const taskTitle = tasks.find(t => t.id === taskId)?.title || 'Task';
       const response = await TaskService.deleteTask(taskId);
       const success = response?.success ?? (response === true);
       if (success) {
         setTasks(prev => prev.filter(task => task.id !== taskId));
+        if (onNotification) {
+          onNotification(`"${taskTitle}" deleted successfully! 🗑️`, 'success');
+        }
         return true;
       } else {
         throw new Error('Failed to delete task');
@@ -94,12 +111,15 @@ const useTasks = () => {
     } catch (err) {
       const errorMessage = err?.response?.data?.message || err?.message || 'Failed to delete task. Please try again.';
       setError(errorMessage);
+      if (onNotification) {
+        onNotification(errorMessage, 'error');
+      }
       console.error('Error in deleteTask:', err);
       return false;
     } finally {
       setActionInProgress(false);
     }
-  }, []);
+  }, [tasks, onNotification]);
 
   // Fetch tasks on initial load
   useEffect(() => {

@@ -4,7 +4,17 @@ import axios from 'axios';
 // Configuration
 // ===========================
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api';
+const API_KEY = process.env.REACT_APP_API_KEY;
+
+// Create axios instance with default headers
+const axiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+    'X-API-Key': API_KEY
+  }
+});
 
 // ===========================
 // Task Service
@@ -20,7 +30,7 @@ export const TaskService = {
    */
   getAllTasks: async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/tasks/recent`);
+      const response = await axiosInstance.get('/tasks/recent');
       return response.data;
     } catch (error) {
       console.error('Error getting all tasks:', error);
@@ -34,7 +44,7 @@ export const TaskService = {
    */
   getRecentTasks: async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/tasks/recent`);
+      const response = await axiosInstance.get('/tasks/recent');
       return response.data;
     } catch (error) {
       console.error('Error getting recent tasks:', error);
@@ -49,7 +59,7 @@ export const TaskService = {
    */
   createTask: async (taskData) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/tasks`, taskData);
+      const response = await axiosInstance.post('/tasks', taskData);
       // Handle nested response structure
       return response.data?.task || response.data?.tasks?.[0] || response.data;
     } catch (error) {
@@ -66,7 +76,7 @@ export const TaskService = {
    */
   updateTask: async (taskId, updates) => {
     try {
-      const response = await axios.put(`${API_BASE_URL}/tasks/${taskId}`, updates);
+      const response = await axiosInstance.put(`/tasks/${taskId}`, updates);
       return response.data;
     } catch (error) {
       console.error('Error updating task:', error);
@@ -81,7 +91,7 @@ export const TaskService = {
    */
   deleteTask: async (taskId) => {
     try {
-      const response = await axios.delete(`${API_BASE_URL}/tasks/${taskId}`);
+      const response = await axiosInstance.delete(`/tasks/${taskId}`);
       // Return the response with success indicator
       return {
         success: true,
@@ -101,7 +111,7 @@ export const TaskService = {
    */
   markTaskAsDone: async (taskId) => {
     try {
-      const response = await axios.put(`${API_BASE_URL}/tasks/${taskId}/mark-as-done`);
+      const response = await axiosInstance.put(`/tasks/${taskId}/mark-as-done`);
       const task = response.data.task;
 
       // Ensure completed property is set based on status

@@ -1,5 +1,20 @@
-// API base URL
-const API_BASE_URL = 'http://localhost:8000/api';
+import axios from 'axios';
+
+// ===========================
+// Configuration
+// ===========================
+
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api';
+const API_KEY = process.env.REACT_APP_API_KEY;
+
+// Create axios instance with default headers
+const axiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+    'X-API-Key': API_KEY
+  }
+});
 
 // API endpoints
 export const ENDPOINTS = {
@@ -11,9 +26,9 @@ const TaskService = {
   // Get all tasks
   getAllTasks: async () => {
     try {
-      const response = await fetch(ENDPOINTS.TASKS);
+      const response = await axiosInstance.get('/tasks');
       if (!response.ok) throw new Error('Failed to fetch tasks');
-      return await response.json();
+      return response.data;
     } catch (error) {
       console.error('Error fetching tasks:', error);
       throw error;
@@ -23,16 +38,9 @@ const TaskService = {
   // Create a new task
   createTask: async (task) => {
     try {
-      const response = await fetch(ENDPOINTS.TASKS, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(task)
-      });
-      
+      const response = await axiosInstance.post('/tasks', task);
       if (!response.ok) throw new Error('Failed to create task');
-      return await response.json();
+      return response.data;
     } catch (error) {
       console.error('Error creating task:', error);
       throw error;
@@ -42,16 +50,9 @@ const TaskService = {
   // Update an existing task
   updateTask: async (id, updates) => {
     try {
-      const response = await fetch(`${ENDPOINTS.TASKS}/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updates)
-      });
-      
+      const response = await axiosInstance.put(`/tasks/${id}`, updates);
       if (!response.ok) throw new Error('Failed to update task');
-      return await response.json();
+      return response.data;
     } catch (error) {
       console.error(`Error updating task with id ${id}:`, error);
       throw error;

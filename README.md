@@ -165,27 +165,6 @@ React Testing Library for component rendering and interactions.
 npm test
 ```
 
-## Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature-name`)
-3. Commit your changes (`git commit -m 'Add feature'`)
-4. Push to the branch (`git push origin feature-name`)
-5. Open a Pull Request
-
-### Guidelines:
-- Follow clean code principles
-- Adhere to SOLID design principles in backend
-- Comment complex logic
-- Ensure tests cover all new functionality
-
-## License
-
-MIT License - see LICENSE file for details
-
-## Support
-
-- Open an issue on GitHub
-- Contact the development team
 
 

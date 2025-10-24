@@ -13,7 +13,8 @@ function App() {
     error, 
     actionInProgress, 
     addTask, 
-    markTaskCompleted
+    markTaskCompleted,
+    deleteTask
   } = useTasks();
 
   const handleAddTask = async () => {
@@ -55,6 +56,7 @@ function App() {
           <TaskBox 
             tasks={tasks}
             onMarkDone={markTaskCompleted}
+            onDeleteTask={deleteTask}
             activeTasksCount={activeTasksCount}
             completedTasksCount={completedTasksCount}
             isLoading={isLoading}

@@ -43,7 +43,8 @@ export const TaskService = {
   createTask: async (taskData) => {
     try {
       const response = await axios.post(`${API_BASE_URL}/tasks`, taskData);
-      return response.data;
+      // Handle nested response structure
+      return response.data?.task || response.data?.tasks?.[0] || response.data;
     } catch (error) {
       console.error('Error creating task:', error);
       throw error;
@@ -69,14 +70,19 @@ export const TaskService = {
   /**
    * Delete a task
    * @param {number|string} taskId - ID of the task to delete
-   * @returns {Promise<void>}
+   * @returns {Promise<Object>} - Response object with success status
    */
   deleteTask: async (taskId) => {
     try {
-      await axios.delete(`${API_BASE_URL}/tasks/${taskId}`);
-      return true;
+      const response = await axios.delete(`${API_BASE_URL}/tasks/${taskId}`);
+      // Return the response with success indicator
+      return {
+        success: true,
+        data: response.data
+      };
     } catch (error) {
-      console.error('Error deleting task:', error);
+      console.error(`Error deleting task with ID ${taskId}:`, error);
+      console.error('Error response:', error.response?.data);
       throw error;
     }
   },

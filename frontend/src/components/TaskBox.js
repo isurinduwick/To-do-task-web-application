@@ -1,7 +1,7 @@
 import React from 'react';
 import { Check, CheckCheck, Loader2 } from 'lucide-react';
 
-const TaskBox = ({ tasks, onMarkDone, activeTasksCount, completedTasksCount, isLoading }) => {
+const TaskBox = ({ tasks, onMarkDone, onDeleteTask, activeTasksCount, completedTasksCount, isLoading }) => {
   return (
     <div className="task-box">
       <div className="task-box-header">
@@ -53,7 +53,11 @@ const TaskBox = ({ tasks, onMarkDone, activeTasksCount, completedTasksCount, isL
                   <span className="mark-done-text">Mark Done</span>
                 </button>
               ) : (
-                <button className="mark-done-button" disabled={isLoading}>
+                <button 
+                  className="mark-done-button" 
+                  onClick={() => onDeleteTask(task.id)}
+                  disabled={isLoading}
+                >
                   <CheckCheck size={16} color="#FFFFFF" />
                   <span className="mark-done-text">Done</span>
                 </button>

@@ -38,8 +38,13 @@ const useTasks = () => {
       setActionInProgress(true);
       setError(null);
       const newTask = await TaskService.createTask(taskData);
-      setTasks(prev => [...prev, newTask]);
-      return newTask;
+      // Ensure newTask has required properties before adding
+      if (newTask && newTask.id) {
+        setTasks(prev => [...prev, newTask]);
+        return newTask;
+      } else {
+        throw new Error('Invalid task response from server');
+      }
     } catch (err) {
       setError('Failed to add task. Please try again.');
       console.error('Error in addTask:', err);
@@ -73,11 +78,19 @@ const useTasks = () => {
     try {
       setActionInProgress(true);
       setError(null);
-      await TaskService.deleteTask(taskId);
-      setTasks(prev => prev.filter(task => task.id !== taskId));
-      return true;
+      
+      const response = await TaskService.deleteTask(taskId);
+      
+      // Handle the response - check for success flag
+      if (response?.success) {
+        setTasks(prev => prev.filter(task => task.id !== taskId));
+        return true;
+      } else {
+        throw new Error('Failed to delete task');
+      }
     } catch (err) {
-      setError('Failed to delete task. Please try again.');
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to delete task. Please try again.';
+      setError(errorMessage);
       console.error('Error in deleteTask:', err);
       return false;
     } finally {

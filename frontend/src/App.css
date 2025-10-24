@@ -305,12 +305,15 @@ body {
 /* Add Task Form Styles */
 .add-task-form {
   width: 510px;
-  height: 796px;
+  max-height: 796px;
   background: #FFFFFF;
   box-shadow: -1px -1px 10px rgba(0, 0, 0, 0.1), 1px 1px 10px rgba(0, 0, 0, 0.1);
   border-radius: 25px;
   padding: 30px;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
 .add-task-title {

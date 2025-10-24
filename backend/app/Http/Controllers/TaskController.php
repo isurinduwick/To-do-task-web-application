@@ -167,13 +167,51 @@ class TaskController extends Controller
     }
 
     /**
+     * Delete a completed task by ID.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroyCompleted(int $id): JsonResponse
+    {
+        try {
+            $task = Task::where('completed', true)->findOrFail($id);
+            $task->delete();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Completed task deleted successfully',
+                'task' => $task
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting completed task',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Remove the specified task.
      */
     public function destroy($id)
     {
-        $task = Task::findOrFail($id);
-        $task->delete();
-        
-        return response()->json(null, 204);
+        try {
+            $task = Task::findOrFail($id);
+            $task->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Task deleted successfully',
+                'task' => $task
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting task',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

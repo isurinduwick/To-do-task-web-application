@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { validateTask, validateTaskLimit, VALIDATION_RULES } from '../utils/taskValidation';
 
-const AddTaskForm = ({ newTask, onInputChange, onAddTask, taskCount, isLoading }) => {
+const AddTaskForm = ({ newTask, onInputChange, onAddTask, taskCount, isLoading, totalTasksCount = 0 }) => {
   const [errors, setErrors] = useState({ title: [], description: [] });
   const [limitError, setLimitError] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -10,7 +10,7 @@ const AddTaskForm = ({ newTask, onInputChange, onAddTask, taskCount, isLoading }
     e.preventDefault();
     setSubmitted(true);
 
-    const limitValidation = validateTaskLimit(taskCount);
+    const limitValidation = validateTaskLimit(taskCount, totalTasksCount);
     if (!limitValidation.isValid) {
       setLimitError(limitValidation.errors[0]);
       setErrors({ title: [], description: [] });

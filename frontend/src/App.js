@@ -34,6 +34,7 @@ function App() {
 
   const activeTasksCount = tasks.filter(task => !task.completed).length;
   const completedTasksCount = tasks.filter(task => task.completed).length;
+  const totalTasksCount = tasks.length;
 
   return (
     <div className="app">
@@ -52,6 +53,7 @@ function App() {
             onAddTask={handleAddTask}
             taskCount={activeTasksCount}
             isLoading={actionInProgress}
+            totalTasksCount={totalTasksCount}
           />
           <TaskBox 
             tasks={tasks}

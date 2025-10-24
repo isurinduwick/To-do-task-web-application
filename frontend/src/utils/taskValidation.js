@@ -54,11 +54,11 @@ export const validateDescription = (description) => {
   };
 };
 
-export const validateTaskLimit = (taskCount) => {
+export const validateTaskLimit = (taskCount, totalTasks) => {
   const errors = [];
 
-  if (taskCount >= VALIDATION_RULES.MAX_TASKS) {
-    errors.push(`You already have ${VALIDATION_RULES.MAX_TASKS} active tasks. Please complete or remove some tasks to add more.`);
+  if (totalTasks >= VALIDATION_RULES.MAX_TASKS) {
+    errors.push(`You have reached the maximum of ${VALIDATION_RULES.MAX_TASKS} tasks. Please delete completed tasks by clicking "Done" to add more.`);
   }
 
   return {

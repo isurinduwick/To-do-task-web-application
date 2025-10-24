@@ -11,13 +11,13 @@ import useTasks from './hooks/useTasks';
 function AppContent() {
   const [newTask, setNewTask] = useState({ title: '', description: '' });
   const { addNotification } = useNotification();
-  
-  const { 
-    tasks, 
-    isLoading, 
-    error, 
-    actionInProgress, 
-    addTask, 
+
+  const {
+    tasks,
+    isLoading,
+    error,
+    actionInProgress,
+    addTask,
     markTaskCompleted,
     deleteTask
   } = useTasks(addNotification);
@@ -50,9 +50,9 @@ function AppContent() {
           <p>You have {activeTasksCount} active tasks today</p>
           {error && <p className="error-message">{error}</p>}
         </div>
-        
+
         <div className="content-container">
-          <AddTaskForm 
+          <AddTaskForm
             newTask={newTask}
             onInputChange={handleInputChange}
             onAddTask={handleAddTask}
@@ -60,7 +60,7 @@ function AppContent() {
             isLoading={actionInProgress}
             totalTasksCount={totalTasksCount}
           />
-          <TaskBox 
+          <TaskBox
             tasks={tasks}
             onMarkDone={markTaskCompleted}
             onDeleteTask={deleteTask}

@@ -1,26 +1,36 @@
 import React from 'react';
 import { Check, CheckCheck, Loader2 } from 'lucide-react';
 
-const TaskBox = ({ tasks, onMarkDone, onDeleteTask, activeTasksCount, completedTasksCount, isLoading }) => {
+const TaskBox = ({
+  tasks,
+  onMarkDone,
+  onDeleteTask,
+  activeTasksCount,
+  completedTasksCount,
+  isLoading
+}) => {
   return (
     <div className="task-box">
+      {/* Task Box Header */}
       <div className="task-box-header">
         <h2 className="tasks-title">Tasks</h2>
-        
+
+        {/* Task Filter */}
         <div className="task-filter">
           <div className="filter-content">
             <div className="active-filter">
-              <div className="active-dot"></div>
+              <div className="active-dot" />
               <span className="active-text">{activeTasksCount} Active</span>
             </div>
             <div className="done-filter">
-              <div className="done-dot"></div>
+              <div className="done-dot" />
               <span className="done-text">{completedTasksCount} Done</span>
             </div>
           </div>
         </div>
       </div>
-      
+
+      {/* Tasks Container */}
       <div className="tasks-container">
         {isLoading && tasks.length === 0 ? (
           <div className="loading-indicator">
@@ -31,10 +41,17 @@ const TaskBox = ({ tasks, onMarkDone, onDeleteTask, activeTasksCount, completedT
           <div className="no-tasks-message">No tasks available</div>
         ) : (
           tasks.map((task) => (
-            <div key={task.id} className={`task-item ${task.completed ? 'completed' : ''}`}>
+            <div
+              key={task.id}
+              className={`task-item ${task.completed ? 'completed' : ''}`}
+            >
               <div className="task-content">
                 <div className="task-checkbox">
-                  <div className={`checkbox-circle ${task.completed ? 'completed-checkbox' : ''}`}>
+                  <div
+                    className={`checkbox-circle ${
+                      task.completed ? 'completed-checkbox' : ''
+                    }`}
+                  >
                     {task.completed && <Check size={12} color="#FFFFFF" />}
                   </div>
                 </div>
@@ -44,7 +61,7 @@ const TaskBox = ({ tasks, onMarkDone, onDeleteTask, activeTasksCount, completedT
                 </div>
               </div>
               {!task.completed ? (
-                <button 
+                <button
                   className="mark-done-button"
                   onClick={() => onMarkDone(task.id)}
                   disabled={isLoading}
@@ -53,8 +70,8 @@ const TaskBox = ({ tasks, onMarkDone, onDeleteTask, activeTasksCount, completedT
                   <span className="mark-done-text">Mark Done</span>
                 </button>
               ) : (
-                <button 
-                  className="mark-done-button" 
+                <button
+                  className="mark-done-button"
                   onClick={() => onDeleteTask(task.id)}
                   disabled={isLoading}
                 >

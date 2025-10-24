@@ -3,6 +3,8 @@ import TaskService from '../services/taskService';
 
 /**
  * Custom hook for managing tasks
+ * @param {Function} onNotification - Callback for notifications
+ * @returns {Object} Task management functions and state
  */
 const useTasks = (onNotification) => {
   const [tasks, setTasks] = useState([]);
@@ -10,12 +12,22 @@ const useTasks = (onNotification) => {
   const [error, setError] = useState(null);
   const [actionInProgress, setActionInProgress] = useState(false);
 
+  // ===========================
+  // Helper Functions
+  // ===========================
+
   const normalizeTask = (task) => ({
     ...task,
     completed: task.completed ?? (task.status === 'completed')
   });
 
-  // Fetch all tasks
+  // ===========================
+  // API Functions
+  // ===========================
+
+  /**
+   * Fetch all tasks from the server
+   */
   const fetchTasks = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -33,7 +45,11 @@ const useTasks = (onNotification) => {
     }
   }, []);
 
-  // Create a new task
+  /**
+   * Add a new task
+   * @param {Object} taskData - Task data with title and description
+   * @returns {Promise<Object|null>} Created task or null on failure
+   */
   const addTask = useCallback(async (taskData) => {
     if (!taskData?.title || !taskData.title.trim()) {
       setError('Task title cannot be empty.');
@@ -44,6 +60,7 @@ const useTasks = (onNotification) => {
       setActionInProgress(true);
       setError(null);
       const newTask = await TaskService.createTask(taskData);
+
       if (newTask && newTask.id) {
         setTasks(prev => [...prev, normalizeTask(newTask)]);
         if (onNotification) {
@@ -65,16 +82,26 @@ const useTasks = (onNotification) => {
     }
   }, [onNotification]);
 
-  // Mark a task as completed
+  /**
+   * Mark a task as completed
+   * @param {number|string} taskId - Task ID to mark as completed
+   * @returns {Promise<Object|null>} Updated task or null on failure
+   */
   const markTaskCompleted = useCallback(async (taskId) => {
     try {
       setActionInProgress(true);
       setError(null);
       const updatedTask = await TaskService.markTaskAsDone(taskId);
-      if (!updatedTask) throw new Error('No task returned from server');
+
+      if (!updatedTask) {
+        throw new Error('No task returned from server');
+      }
+
       const normalized = normalizeTask(updatedTask);
       const taskTitle = tasks.find(t => t.id === taskId)?.title || 'Task';
+
       setTasks(prev => prev.map(t => (t.id === taskId ? normalized : t)));
+
       if (onNotification) {
         onNotification(`"${taskTitle}" marked as done! ✓`, 'success');
       }
@@ -91,7 +118,11 @@ const useTasks = (onNotification) => {
     }
   }, [tasks, onNotification]);
 
-  // Delete a task
+  /**
+   * Delete a task
+   * @param {number|string} taskId - Task ID to delete
+   * @returns {Promise<boolean>} Success status
+   */
   const deleteTask = useCallback(async (taskId) => {
     try {
       setActionInProgress(true);
@@ -99,6 +130,7 @@ const useTasks = (onNotification) => {
       const taskTitle = tasks.find(t => t.id === taskId)?.title || 'Task';
       const response = await TaskService.deleteTask(taskId);
       const success = response?.success ?? (response === true);
+
       if (success) {
         setTasks(prev => prev.filter(task => task.id !== taskId));
         if (onNotification) {
@@ -109,7 +141,8 @@ const useTasks = (onNotification) => {
         throw new Error('Failed to delete task');
       }
     } catch (err) {
-      const errorMessage = err?.response?.data?.message || err?.message || 'Failed to delete task. Please try again.';
+      const errorMessage =
+        err?.response?.data?.message || err?.message || 'Failed to delete task. Please try again.';
       setError(errorMessage);
       if (onNotification) {
         onNotification(errorMessage, 'error');
@@ -121,10 +154,17 @@ const useTasks = (onNotification) => {
     }
   }, [tasks, onNotification]);
 
-  // Fetch tasks on initial load
+  // ===========================
+  // Effects
+  // ===========================
+
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
+
+  // ===========================
+  // Return
+  // ===========================
 
   return {
     tasks,

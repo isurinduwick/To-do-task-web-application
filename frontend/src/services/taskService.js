@@ -1,7 +1,14 @@
 import axios from 'axios';
 
-// API base URL
+// ===========================
+// Configuration
+// ===========================
+
 const API_BASE_URL = 'http://localhost:8000/api';
+
+// ===========================
+// Task Service
+// ===========================
 
 /**
  * Task Service - Handles all API calls related to tasks
@@ -9,7 +16,7 @@ const API_BASE_URL = 'http://localhost:8000/api';
 export const TaskService = {
   /**
    * Get all tasks
-   * @returns {Promise<Array>} - Array of task objects
+   * @returns {Promise<Array>} Array of task objects
    */
   getAllTasks: async () => {
     try {
@@ -23,7 +30,7 @@ export const TaskService = {
 
   /**
    * Get recent tasks
-   * @returns {Promise<Array>} - Array of recent task objects
+   * @returns {Promise<Array>} Array of recent task objects
    */
   getRecentTasks: async () => {
     try {
@@ -38,7 +45,7 @@ export const TaskService = {
   /**
    * Create a new task
    * @param {Object} taskData - Task data (title, description)
-   * @returns {Promise<Object>} - Created task object
+   * @returns {Promise<Object>} Created task object
    */
   createTask: async (taskData) => {
     try {
@@ -55,7 +62,7 @@ export const TaskService = {
    * Update a task
    * @param {number|string} taskId - ID of the task to update
    * @param {Object} updates - Task properties to update
-   * @returns {Promise<Object>} - Updated task object
+   * @returns {Promise<Object>} Updated task object
    */
   updateTask: async (taskId, updates) => {
     try {
@@ -70,7 +77,7 @@ export const TaskService = {
   /**
    * Delete a task
    * @param {number|string} taskId - ID of the task to delete
-   * @returns {Promise<Object>} - Response object with success status
+   * @returns {Promise<Object>} Response object with success status
    */
   deleteTask: async (taskId) => {
     try {
@@ -90,13 +97,13 @@ export const TaskService = {
   /**
    * Mark a task as done
    * @param {number|string} taskId - ID of the task to mark as done
-   * @returns {Promise<Object>} - Updated task object
+   * @returns {Promise<Object>} Updated task object
    */
   markTaskAsDone: async (taskId) => {
     try {
       const response = await axios.put(`${API_BASE_URL}/tasks/${taskId}/mark-as-done`);
       const task = response.data.task;
-      
+
       // Ensure completed property is set based on status
       return {
         ...task,

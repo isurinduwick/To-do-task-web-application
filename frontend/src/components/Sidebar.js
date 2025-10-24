@@ -1,7 +1,12 @@
 import React from 'react';
 import { ListChecks, Circle, CheckCircle2 } from 'lucide-react';
 
-const Sidebar = () => {
+const Sidebar = ({ tasks = [] }) => {
+  const totalTasksCount = tasks.length;
+  const activeTasksCount = tasks.filter(task => !task.completed).length;
+  const completedTasksCount = tasks.filter(task => task.completed).length;
+  const progressPercentage = totalTasksCount > 0 ? Math.round((completedTasksCount / totalTasksCount) * 100) : 0;
+
   return (
     <div className="sidebar">
       {/* Logo Section */}
@@ -20,13 +25,13 @@ const Sidebar = () => {
       <div className="menu-section">
         <div className="menu-title">Menu</div>
         
-        {/* All Tasks - Active State */}
+        {/* All Tasks */}
         <div className="menu-item active">
           <div className="menu-item-content">
             <ListChecks size={18} color="#FFFFFF" />
             <span>All Tasks count</span>
           </div>
-          <div className="menu-count">10</div>
+          <div className="menu-count">{totalTasksCount}</div>
         </div>
 
         {/* Active */}
@@ -35,7 +40,7 @@ const Sidebar = () => {
             <Circle size={18} color="#FFFFFF" />
             <span>Active count</span>
           </div>
-          <div className="menu-count">10</div>
+          <div className="menu-count">{activeTasksCount}</div>
         </div>
 
         {/* Completed */}
@@ -44,7 +49,7 @@ const Sidebar = () => {
             <CheckCircle2 size={18} color="#FFFFFF" />
             <span>Completed count</span>
           </div>
-          <div className="menu-count">10</div>
+          <div className="menu-count">{completedTasksCount}</div>
         </div>
       </div>
 
@@ -52,14 +57,14 @@ const Sidebar = () => {
       <div className="progress-section">
         <div className="progress-header">
           <span>Progress</span>
-          <span className="progress-percentage">33%</span>
+          <span className="progress-percentage">{progressPercentage}%</span>
         </div>
         
         <div className="progress-bar">
-          <div className="progress-completed"></div>
+          <div className="progress-completed" style={{ width: `${progressPercentage}%` }}></div>
         </div>
         
-        <div className="progress-text">2 of 6 Tasks Completed</div>
+        <div className="progress-text">{completedTasksCount} of {totalTasksCount} Tasks Completed</div>
       </div>
     </div>
   );

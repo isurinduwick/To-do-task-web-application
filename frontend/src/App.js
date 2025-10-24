@@ -37,7 +37,7 @@ function App() {
 
   return (
     <div className="app">
-      <Sidebar />
+      <Sidebar tasks={tasks} />
       <main className="main-content">
         <div className="welcome-section">
           <h1>Welcome Back!</h1>

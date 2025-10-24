@@ -1,6 +1,6 @@
 # To-Do Task Web Application
 
-![To-Do App Screenshot](assets\Todo.png)
+![To-Do App Screenshot](assets/Todo.png)
 
 A simple, modern web application for managing your daily tasks. Add tasks, mark them as done, and automatically remove completed tasks with a clean, responsive interface.  
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Services\TaskService;
+use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -27,15 +28,20 @@ class TaskController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        // Validate the request data
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
-        
-        $result = $this->taskService->createTask($validated);
-        
-        return response()->json($result, 201);
+        try {
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'nullable|string',
+            ]);
+            
+            $result = $this->taskService->createTask($validated);
+            
+            return ApiResponse::created($result['task'], $result['message']);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return ApiResponse::validationError($e->errors());
+        } catch (\Exception $e) {
+            return ApiResponse::serverError($e->getMessage());
+        }
     }
 
     /**
@@ -45,55 +51,66 @@ class TaskController extends Controller
      */
     public function recent(): JsonResponse
     {
-        $recentTasks = $this->taskService->getRecentTasks();
-        
-        return response()->json($recentTasks);
+        try {
+            $recentTasks = $this->taskService->getRecentTasks();
+            
+            return ApiResponse::collection($recentTasks, $recentTasks->count(), 'Recent tasks retrieved');
+        } catch (\Exception $e) {
+            return ApiResponse::serverError($e->getMessage());
+        }
     }
 
     /**
      * Display a listing of all tasks.
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        $tasks = $this->taskService->getAllTasks();
-        return response()->json([
-            'tasks' => $tasks,
-            'count' => $tasks->count()
-        ]);
+        try {
+            $tasks = $this->taskService->getAllTasks();
+            return ApiResponse::collection($tasks, $tasks->count(), 'All tasks retrieved');
+        } catch (\Exception $e) {
+            return ApiResponse::serverError($e->getMessage());
+        }
     }
 
     /**
      * Display a listing of active tasks.
      */
-    public function active()
+    public function active(): JsonResponse
     {
-        $tasks = $this->taskService->getActiveTasks();
-        return response()->json([
-            'tasks' => $tasks,
-            'count' => $tasks->count()
-        ]);
+        try {
+            $tasks = $this->taskService->getActiveTasks();
+            return ApiResponse::collection($tasks, $tasks->count(), 'Active tasks retrieved');
+        } catch (\Exception $e) {
+            return ApiResponse::serverError($e->getMessage());
+        }
     }
 
     /**
      * Display a listing of completed tasks.
      */
-    public function completed()
+    public function completed(): JsonResponse
     {
-        $tasks = $this->taskService->getCompletedTasks();
-        return response()->json([
-            'tasks' => $tasks,
-            'count' => $tasks->count()
-        ]);
+        try {
+            $tasks = $this->taskService->getCompletedTasks();
+            return ApiResponse::collection($tasks, $tasks->count(), 'Completed tasks retrieved');
+        } catch (\Exception $e) {
+            return ApiResponse::serverError($e->getMessage());
+        }
     }
 
     /**
      * Get progress statistics.
      */
-    public function progress()
+    public function progress(): JsonResponse
     {
-        $stats = $this->taskService->getProgress();
-        
-        return response()->json($stats);
+        try {
+            $stats = $this->taskService->getProgress();
+            
+            return ApiResponse::stats($stats, 'Progress statistics retrieved');
+        } catch (\Exception $e) {
+            return ApiResponse::serverError($e->getMessage());
+        }
     }
 
     /**
@@ -107,69 +124,75 @@ class TaskController extends Controller
         try {
             $result = $this->taskService->completeTask($id);
             
-            $statusCode = $result['success'] ? 200 : 404;
+            if (!$result['success']) {
+                return ApiResponse::notFound($result['message']);
+            }
             
-            return response()->json($result, $statusCode);
+            return ApiResponse::updated($result['task'], $result['message']);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error marking task as done',
-                'error' => $e->getMessage()
-            ], 500);
+            return ApiResponse::serverError($e->getMessage());
         }
     }
 
     /**
      * Display the specified task.
      */
-    public function show($id)
+    public function show($id): JsonResponse
     {
-        $result = $this->taskService->getTaskById($id);
-        
-        if (!$result['success']) {
-            return response()->json($result, 404);
-        }
+        try {
+            $result = $this->taskService->getTaskById($id);
+            
+            if (!$result['success']) {
+                return ApiResponse::notFound($result['message']);
+            }
 
-        return response()->json($result['task']);
+            return ApiResponse::success($result['task'], 'Task retrieved');
+        } catch (\Exception $e) {
+            return ApiResponse::serverError($e->getMessage());
+        }
     }
 
     /**
      * Update the specified task.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id): JsonResponse
     {
-        $request->validate([
-            'title' => 'string|max:255',
-            'description' => 'nullable|string',
-            'completed' => 'boolean'
-        ]);
+        try {
+            $request->validate([
+                'title' => 'string|max:255',
+                'description' => 'nullable|string',
+                'completed' => 'boolean'
+            ]);
 
-        $result = $this->taskService->updateTask($id, $request->all());
-        
-        if (!$result['success']) {
-            return response()->json($result, 404);
+            $result = $this->taskService->updateTask($id, $request->all());
+            
+            if (!$result['success']) {
+                return ApiResponse::notFound($result['message']);
+            }
+
+            return ApiResponse::updated($result['task'], $result['message']);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return ApiResponse::validationError($e->errors());
+        } catch (\Exception $e) {
+            return ApiResponse::serverError($e->getMessage());
         }
-
-        return response()->json($result['task']);
     }
 
     /**
      * Remove the specified task.
      */
-    public function destroy($id)
+    public function destroy($id): JsonResponse
     {
         try {
             $result = $this->taskService->deleteTask($id);
             
-            $statusCode = $result['success'] ? 200 : 404;
+            if (!$result['success']) {
+                return ApiResponse::notFound($result['message']);
+            }
             
-            return response()->json($result, $statusCode);
+            return ApiResponse::deleted($result['message']);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error deleting task',
-                'error' => $e->getMessage()
-            ], 500);
+            return ApiResponse::serverError($e->getMessage());
         }
     }
 }

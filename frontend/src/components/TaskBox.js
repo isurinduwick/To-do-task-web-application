@@ -38,7 +38,7 @@ const TaskBox = ({
             <span>Loading tasks...</span>
           </div>
         ) : tasks.length === 0 ? (
-          <div className="no-tasks-message">No tasks available</div>
+          <div className="no-tasks-message">No tasks available, please add some tasks.</div>
         ) : (
           tasks.map((task) => (
             <div

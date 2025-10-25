@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { validateTask, validateTaskLimit, VALIDATION_RULES } from '../utils/taskValidation';
 import { useNotification } from '../hooks/useNotification';
+import ValidationModal from './ValidationModal';
 import '../styles/AddTaskForm.css';
 
 const AddTaskForm = ({
@@ -12,7 +13,8 @@ const AddTaskForm = ({
   totalTasksCount = 0
 }) => {
   const [errors, setErrors] = useState({ title: [], description: [] });
-  const [limitError, setLimitError] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [modalErrors, setModalErrors] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const { addNotification } = useNotification();
 
@@ -20,60 +22,67 @@ const AddTaskForm = ({
     e.preventDefault();
     setSubmitted(true);
 
+    // Check task limit first
     const limitValidation = validateTaskLimit(taskCount, totalTasksCount);
     if (!limitValidation.isValid) {
-      setLimitError(limitValidation.errors[0]);
+      setModalErrors(limitValidation.errors);
+      setShowModal(true);
       setErrors({ title: [], description: [] });
       return;
     }
 
-    setLimitError('');
-
+    // Validate task content
     const validation = validateTask(newTask);
 
     if (!validation.isValid) {
+      const allErrors = [...validation.errors.title, ...validation.errors.description];
       setErrors(validation.errors);
+      setModalErrors(allErrors);
+      setShowModal(true);
       return;
     }
 
+    // All validations passed
     setErrors({ title: [], description: [] });
+    setShowModal(false);
     onAddTask();
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
   };
 
   return (
     <div className="add-task-form">
       <h2 className="add-task-title">Add a Task</h2>
 
-      {limitError && (
-        <div className="error-messages" style={{ marginBottom: '20px' }}>
-          <p className="error-text" style={{ color: '#ff6b6b', fontWeight: 'bold' }}>
-            {limitError}
-          </p>
-        </div>
-      )}
-
       <form onSubmit={handleSubmit}>
         {/* Title Input Section */}
         <div className="form-group">
-          <label className="form-label title-label">Title</label>
+          <label className="form-label title-label">
+            Title 
+            <span className="required-asterisk">*</span>
+            <span className="min-length-hint">(min 3 characters)</span>
+          </label>
           <input
             type="text"
-            className="title-input"
+            className={`title-input ${submitted && errors.title.length > 0 ? 'input-error' : ''}`}
             placeholder="Enter task title..."
             name="title"
             value={newTask.title}
             onChange={onInputChange}
             maxLength={VALIDATION_RULES.TITLE_MAX_LENGTH}
             disabled={isLoading}
+            aria-invalid={submitted && errors.title.length > 0}
           />
           <div className="char-count">
             {newTask.title.length}/{VALIDATION_RULES.TITLE_MAX_LENGTH}
           </div>
           {submitted && errors.title.length > 0 && (
-            <div className="error-messages">
+            <div className="inline-error-messages">
               {errors.title.map((error, idx) => (
-                <p key={idx} className="error-text">
-                  {error}
+                <p key={idx} className="inline-error-text">
+                  ⚠️ {error}
                 </p>
               ))}
             </div>
@@ -82,24 +91,28 @@ const AddTaskForm = ({
 
         {/* Description Input Section */}
         <div className="form-group">
-          <label className="form-label description-label">Description</label>
+          <label className="form-label description-label">
+            Description
+            <span className="required-asterisk">*</span>
+          </label>
           <textarea
-            className="description-input"
-            placeholder="Enter task Description..."
+            className={`description-input ${submitted && errors.description.length > 0 ? 'input-error' : ''}`}
+            placeholder="Enter task description..."
             name="description"
             value={newTask.description}
             onChange={onInputChange}
             maxLength={VALIDATION_RULES.DESCRIPTION_MAX_LENGTH}
             disabled={isLoading}
+            aria-invalid={submitted && errors.description.length > 0}
           />
           <div className="char-count">
             {newTask.description.length}/{VALIDATION_RULES.DESCRIPTION_MAX_LENGTH}
           </div>
           {submitted && errors.description.length > 0 && (
-            <div className="error-messages">
+            <div className="inline-error-messages">
               {errors.description.map((error, idx) => (
-                <p key={idx} className="error-text">
-                  {error}
+                <p key={idx} className="inline-error-text">
+                  ⚠️ {error}
                 </p>
               ))}
             </div>
@@ -115,6 +128,14 @@ const AddTaskForm = ({
           <span>{isLoading ? 'Adding...' : '+ Add Task'}</span>
         </button>
       </form>
+
+      {/* Validation Modal */}
+      <ValidationModal
+        isOpen={showModal}
+        errors={modalErrors}
+        onClose={handleCloseModal}
+        title="Validation Error"
+      />
     </div>
   );
 };

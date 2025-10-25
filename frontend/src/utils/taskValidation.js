@@ -1,4 +1,5 @@
 export const VALIDATION_RULES = {
+  TITLE_MIN_LENGTH: 3,
   TITLE_MAX_LENGTH: 100,
   DESCRIPTION_MAX_LENGTH: 500,
   INVALID_TITLE_CHARS: /[@#$%^&*()_+|~=`{}\[\]:;"'<>,.?\/]/g,
@@ -14,6 +15,10 @@ export const validateTitle = (title) => {
 
   if (title.length > 0 && title[0] === ' ') {
     errors.push('Title cannot start with a space');
+  }
+
+  if (title.length < VALIDATION_RULES.TITLE_MIN_LENGTH) {
+    errors.push(`Title must be at least ${VALIDATION_RULES.TITLE_MIN_LENGTH} characters long`);
   }
 
   if (title.length > VALIDATION_RULES.TITLE_MAX_LENGTH) {

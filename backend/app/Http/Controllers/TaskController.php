@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Services\TaskService;
+use App\Http\Responses\ResponseFormatter;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -27,7 +28,6 @@ class TaskController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        // Validate the request data
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -35,7 +35,7 @@ class TaskController extends Controller
         
         $result = $this->taskService->createTask($validated);
         
-        return response()->json($result, 201);
+        return ResponseFormatter::fromServiceResponse($result, 201, 400);
     }
 
     /**
@@ -47,7 +47,7 @@ class TaskController extends Controller
     {
         $recentTasks = $this->taskService->getRecentTasks();
         
-        return response()->json($recentTasks);
+        return ResponseFormatter::success($recentTasks);
     }
 
     /**
@@ -56,7 +56,7 @@ class TaskController extends Controller
     public function index()
     {
         $tasks = $this->taskService->getAllTasks();
-        return response()->json([
+        return ResponseFormatter::success([
             'tasks' => $tasks,
             'count' => $tasks->count()
         ]);
@@ -68,7 +68,7 @@ class TaskController extends Controller
     public function active()
     {
         $tasks = $this->taskService->getActiveTasks();
-        return response()->json([
+        return ResponseFormatter::success([
             'tasks' => $tasks,
             'count' => $tasks->count()
         ]);
@@ -80,7 +80,7 @@ class TaskController extends Controller
     public function completed()
     {
         $tasks = $this->taskService->getCompletedTasks();
-        return response()->json([
+        return ResponseFormatter::success([
             'tasks' => $tasks,
             'count' => $tasks->count()
         ]);
@@ -93,7 +93,7 @@ class TaskController extends Controller
     {
         $stats = $this->taskService->getProgress();
         
-        return response()->json($stats);
+        return ResponseFormatter::success($stats);
     }
 
     /**
@@ -107,15 +107,9 @@ class TaskController extends Controller
         try {
             $result = $this->taskService->completeTask($id);
             
-            $statusCode = $result['success'] ? 200 : 404;
-            
-            return response()->json($result, $statusCode);
+            return ResponseFormatter::fromServiceResponse($result, 200, 404);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error marking task as done',
-                'error' => $e->getMessage()
-            ], 500);
+            return ResponseFormatter::error('Error marking task as done', 500, $e->getMessage());
         }
     }
 
@@ -127,10 +121,10 @@ class TaskController extends Controller
         $result = $this->taskService->getTaskById($id);
         
         if (!$result['success']) {
-            return response()->json($result, 404);
+            return ResponseFormatter::error($result['message'], 404);
         }
 
-        return response()->json($result['task']);
+        return ResponseFormatter::success($result['task']);
     }
 
     /**
@@ -147,10 +141,10 @@ class TaskController extends Controller
         $result = $this->taskService->updateTask($id, $request->all());
         
         if (!$result['success']) {
-            return response()->json($result, 404);
+            return ResponseFormatter::error($result['message'], 404);
         }
 
-        return response()->json($result['task']);
+        return ResponseFormatter::success($result['task']);
     }
 
     /**
@@ -163,13 +157,9 @@ class TaskController extends Controller
             
             $statusCode = $result['success'] ? 200 : 404;
             
-            return response()->json($result, $statusCode);
+            return ResponseFormatter::success($result, $statusCode);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error deleting task',
-                'error' => $e->getMessage()
-            ], 500);
+            return ResponseFormatter::error('Error deleting task', 500, $e->getMessage());
         }
     }
 }
